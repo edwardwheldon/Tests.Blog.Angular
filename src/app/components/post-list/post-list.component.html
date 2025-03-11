@@ -1,0 +1,21 @@
+<div class="posts-container">
+  <ul>
+    @for(post of posts; track post.id) {
+    <li>
+      <article>
+        <h2 class="post-title">{{ post.title }}</h2>
+        <p class="post-content">{{ post.content }}</p>
+      </article>
+
+      <div class="like-button-container">
+        <button class="like-button">-</button>
+        <span class="like-value">10</span>
+        <button class="like-button">+</button>
+      </div>
+
+    </li>
+    } @empty {
+    <li><p>No posts avaialbe</p></li>
+    }
+  </ul>
+</div>
