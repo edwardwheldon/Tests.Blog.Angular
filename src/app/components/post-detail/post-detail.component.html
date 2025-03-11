@@ -1,0 +1,8 @@
+<div class="post-container">
+  @if (post) {
+  <a [routerLink]="['/posts']">< Back to posts</a>
+  <app-post [post]="post"></app-post>
+  } @else {
+  <p>Loading...</p>
+  }
+</div>

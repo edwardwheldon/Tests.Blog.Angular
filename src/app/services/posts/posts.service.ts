@@ -17,4 +17,7 @@ export class PostsService {
     });
   }
 
+  public getPost(id: number): Observable<IPost> {
+    return this._http.get<IPost>(`http://localhost:3000/posts/${id}`);
+  }
 }

@@ -1,10 +1,11 @@
 import { PostsService } from '../../services/posts/posts.service';
 import { IPost } from '../../services/posts/interfaces/post.interface';
 import { Component, Input, OnInit, signal } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-post',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css',
   standalone: true,

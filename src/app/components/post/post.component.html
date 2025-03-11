@@ -1,5 +1,7 @@
 <article>
-  <h2 class="post-title">{{ post.title }}</h2>
+  <a [routerLink]="['/posts', post.id]"
+    ><h2 class="post-title">{{ post.title }}</h2></a
+  >
   <p class="post-content">{{ post.content }}</p>
 </article>
 
