@@ -17,7 +17,6 @@ export class PostDetailComponent implements OnInit {
   private postsService = inject(PostsService);
   private route = inject(ActivatedRoute);
 
-
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {

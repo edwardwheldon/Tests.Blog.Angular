@@ -1,7 +1,8 @@
 import { PostsService } from '../../services/posts/posts.service';
 import { IPost } from '../../services/posts/interfaces/post.interface';
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-post',
@@ -11,29 +12,38 @@ import { RouterModule } from '@angular/router';
   standalone: true,
 })
 
-export class PostComponent implements OnInit {
+export class PostComponent implements OnInit, OnDestroy {
   @Input() post!: IPost;
   likeCount = signal(0);
+  private destroy$ = new Subject<void>();
 
-  constructor(private postService: PostsService) {}
+  private postService = inject(PostsService);
 
   ngOnInit(): void {
     this.likeCount.set(this.post.likeCount);
   }
 
-  incrementLikeCount(): void {
+  public incrementLikeCount(): void {
     this.likeCount.update((value) => value + 1);
     this.updatePostLikes();
   }
 
-  decrementLikeCount(): void {
+  public decrementLikeCount(): void {
     this.likeCount.update((value) => value - 1);
     this.updatePostLikes();
   }
 
-  updatePostLikes(): void {
-    this.postService
-      .updateLikes({ ...this.post, likeCount: this.likeCount() })
-      .subscribe();
+  public updatePostLikes(): void {
+    if(this.post){
+      this.postService
+        .updateLikes(this.post.id, this.likeCount())
+        .pipe(takeUntil(this.destroy$))
+        .subscribe();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

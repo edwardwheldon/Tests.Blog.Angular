@@ -1,6 +1,6 @@
 <div class="post-container">
   <ul>
-    @for(post of posts; track post.id) {
+    @for(post of posts(); track post.id) {
     <li>
       <app-post [post]="post"></app-post>
     </li>

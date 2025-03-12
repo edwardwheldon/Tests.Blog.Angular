@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { PostsService } from '../../services/posts/posts.service';
 import { IPost } from '../../services/posts/interfaces/post.interface';
 import { PostComponent } from '../post/post.component';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-post-list',
@@ -9,17 +10,10 @@ import { PostComponent } from '../post/post.component';
   templateUrl: './post-list.component.html',
   styleUrl: './post-list.component.css',
   standalone: true,
-  providers: [PostsService]
+  providers: [PostsService],
 })
-export class PostListComponent implements OnInit {
-  posts: IPost[] = [];
+export class PostListComponent  {
+  private postService = inject(PostsService);
 
-  constructor(private postService: PostsService) {
-  }
-
-  ngOnInit(): void {
-    this.postService.getPosts().subscribe((posts) => {
-      this.posts = posts;
-    });
-  }
+  posts = toSignal(this.postService.getPosts(), {initialValue: [] as IPost[]});
 }
