@@ -13,6 +13,7 @@ import { Subject } from 'rxjs';
 @Component({
   selector: 'app-post-detail',
   imports: [PostComponent, RouterModule, LoaderComponent],
+  providers: [PostsService],
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.css',
   standalone: true,

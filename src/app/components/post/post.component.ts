@@ -14,6 +14,7 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-post',
   imports: [RouterModule],
+  providers: [PostsService],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css',
   standalone: true,
