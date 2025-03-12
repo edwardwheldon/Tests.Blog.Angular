@@ -1,28 +1,50 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, signal, effect, OnDestroy } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PostsService } from '../../services/posts/posts.service';
 import { IPost } from '../../services/posts/interfaces/post.interface';
 import { PostComponent } from '../post/post.component';
-import { RouterModule } from '@angular/router';
+import { LoaderComponent } from '../loader/loader.component';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-post-detail',
-  imports: [PostComponent, RouterModule],
+  imports: [PostComponent, RouterModule, LoaderComponent],
   templateUrl: './post-detail.component.html',
-  styleUrl: './post-detail.component.css'
+  styleUrl: './post-detail.component.css',
+  standalone: true,
 })
-export class PostDetailComponent implements OnInit {
-  post: IPost | undefined;
-
+export class PostDetailComponent implements OnDestroy {
   private postsService = inject(PostsService);
   private route = inject(ActivatedRoute);
+  private destroy$ = new Subject<void>();
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (id) {
-      this.postsService.getPost(id).subscribe((post) => {
-        this.post = post;
-      });
-    }
+  postId = toSignal(
+    this.route.paramMap.pipe(map((params) => Number(params.get('id'))))
+  );
+
+  post = signal<IPost | undefined>(undefined);
+  loading = signal(true);
+
+  constructor() {
+    effect(() => {
+      const id = this.postId();
+      if (id) {
+        this.loading.set(true);
+        this.postsService
+          .getPost(id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((post) => {
+            this.post.set(post);
+            this.loading.set(false);
+          });
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,8 +1,10 @@
+@if(loading()) {
+<app-loader></app-loader>
+}
+
 <div class="post-container">
-  @if (post) {
+  @if (post()) {
   <a [routerLink]="['/posts']">< Back to posts</a>
-  <app-post [post]="post"></app-post>
-  } @else {
-  <p>Loading...</p>
+  <app-post [post]="post()!"></app-post>
   }
 </div>
