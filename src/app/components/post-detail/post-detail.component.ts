@@ -1,13 +1,15 @@
-import { Component, inject, signal, effect, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PostsService } from '../../services/posts/posts.service';
 import { IPost } from '../../services/posts/interfaces/post.interface';
 import { PostComponent } from '../post/post.component';
 import { LoaderComponent } from '../loader/loader.component';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
+/**
+ * Component to display the details of a single post.
+ */
 @Component({
   selector: 'app-post-detail',
   imports: [PostComponent, RouterModule, LoaderComponent],
@@ -15,38 +17,29 @@ import { Subject } from 'rxjs';
   styleUrl: './post-detail.component.css',
   standalone: true,
 })
-export class PostDetailComponent implements OnDestroy {
+export class PostDetailComponent implements OnInit, OnDestroy {
+
   private postsService = inject(PostsService);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
 
-  postId = toSignal(
-    this.route.paramMap.pipe(map((params) => Number(params.get('id'))))
-  );
-
-  /**
-   * Signal containing the post ID from the route parameters.
-   */
-  post = signal<IPost | undefined>(undefined);
-  loading = signal(true);
+  post: IPost | undefined;
+  loading = true;
 
   /**
    * Initialize the component and fetch post data.
    */
-  constructor() {
-    effect(() => {
-      const id = this.postId();
-      if (id) {
-        this.loading.set(true);
-        this.postsService
-          .getPost(id)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe((post) => {
-            this.post.set(post);
-            this.loading.set(false);
-          });
-      }
-    });
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (id) {
+      this.postsService
+        .getPost(id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((post) => {
+          this.post = post;
+          this.loading = false;
+        });
+    }
   }
 
   ngOnDestroy(): void {
