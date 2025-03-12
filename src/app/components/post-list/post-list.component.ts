@@ -16,10 +16,16 @@ export class PostListComponent {
   private postService = inject(PostsService);
   loading = signal(true);
 
+  /**
+   * Signal containing the list of posts.
+   */
   posts = toSignal(this.postService.getPosts(), {
     initialValue: [] as IPost[],
   });
 
+  /**
+   * initialize the component and set up the loading effect.
+   */
   constructor() {
     effect(() => {
       if (this.posts() && this.posts().length > 0) {

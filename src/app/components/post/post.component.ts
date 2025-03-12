@@ -1,6 +1,13 @@
 import { PostsService } from '../../services/posts/posts.service';
 import { IPost } from '../../services/posts/interfaces/post.interface';
-import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -11,7 +18,6 @@ import { Subject, takeUntil } from 'rxjs';
   styleUrl: './post.component.css',
   standalone: true,
 })
-
 export class PostComponent implements OnInit, OnDestroy {
   @Input() post!: IPost;
   likeCount = signal(0);
@@ -23,18 +29,27 @@ export class PostComponent implements OnInit, OnDestroy {
     this.likeCount.set(this.post.likeCount);
   }
 
+  /**
+   * Increments the like count and updates the post on the server
+   */
   public incrementLikeCount(): void {
     this.likeCount.update((value) => value + 1);
     this.updatePostLikes();
   }
 
+  /**
+   * Decrements the like count and updates the post on the server
+   */
   public decrementLikeCount(): void {
     this.likeCount.update((value) => value - 1);
     this.updatePostLikes();
   }
 
+  /**
+   * Updates the like count of the post on the server
+   */
   public updatePostLikes(): void {
-    if(this.post){
+    if (this.post) {
       this.postService
         .updateLikes(this.post.id, this.likeCount())
         .pipe(takeUntil(this.destroy$))

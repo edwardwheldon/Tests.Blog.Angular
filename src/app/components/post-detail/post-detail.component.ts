@@ -24,9 +24,15 @@ export class PostDetailComponent implements OnDestroy {
     this.route.paramMap.pipe(map((params) => Number(params.get('id'))))
   );
 
+  /**
+   * Signal containing the post ID from the route parameters.
+   */
   post = signal<IPost | undefined>(undefined);
   loading = signal(true);
 
+  /**
+   * Initialize the component and fetch post data.
+   */
   constructor() {
     effect(() => {
       const id = this.postId();
