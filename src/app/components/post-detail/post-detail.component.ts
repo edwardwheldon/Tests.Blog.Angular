@@ -4,8 +4,8 @@ import { PostsService } from '../../services/posts/posts.service';
 import { IPost } from '../../services/posts/interfaces/post.interface';
 import { PostComponent } from '../post/post.component';
 import { LoaderComponent } from '../loader/loader.component';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 /**
  * Component to display the details of a single post.
@@ -27,15 +27,29 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   post: IPost | undefined;
   loading = true;
 
-  /**
-   * Initialize the component and fetch post data.
-   */
+/**
+ * Initializes the component and fetches the details of a single post based on the route parameter.
+ * Extracts the post ID from the route's `paramMap`, fetches the post data using `PostsService`,
+ * updates the `post` and `loading` properties, and handles potential errors during data fetching.
+ *
+ * @see {@link ngOnDestroy} for subscription cleanup.
+ * @see {@link PostsService.getPost} for the data fetching service.
+ * @see {@link ActivatedRoute} for route parameter retrieval.
+ *
+ * @returns {void}
+ */
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
       this.postsService
         .getPost(id)
-        .pipe(takeUntil(this.destroy$))
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError(() => { 
+            this.loading = false;
+            return of(undefined);
+          })
+        )
         .subscribe((post) => {
           this.post = post;
           this.loading = false;

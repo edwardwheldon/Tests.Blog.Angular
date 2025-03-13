@@ -1,15 +1,15 @@
-@if(!posts()) {
-<app-loader></app-loader>
+@if (loading()) {
+  <app-loader></app-loader>
+} @else {
+  <div class="post-container">
+    <ul>
+      @for (post of posts(); track post.id) {
+        <li>
+          <app-post [post]="post"></app-post>
+        </li>
+      } @empty {
+        <li><p>No posts available</p></li>
+      }
+    </ul>
+  </div>
 }
-
-<div class="post-container">
-  <ul>
-    @for(post of posts(); track post.id) {
-    <li>
-      <app-post [post]="post"></app-post>
-    </li>
-    } @empty {
-    <li><p>No posts available</p></li>
-    }
-  </ul>
-</div>
